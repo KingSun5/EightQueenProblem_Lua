@@ -1,0 +1,186 @@
+
+
+
+-------------------------------穷举算
+
+--检查(n,c)是否不会被攻击
+-- function isplaceok(a,n,c)
+-- 	for i=1,n-1 do
+-- 		if (a[i] == c) or           --同一行
+-- 			(a[i]-i == c-n) or 		--对角线
+-- 			(a[i] + i == c+n) then	--对角线
+-- 			return false
+-- 		end
+-- 	end
+-- 	return true --不会被攻击
+-- end
+
+-- --打印棋盘
+-- function printsolution(a)
+-- 	for i=1,8 do
+-- 		for j=1,8 do
+-- 			io.write(a[i]==j and "X" or "-"," ")
+-- 		end
+-- 		io.write("\n")
+-- 	end
+-- 	io.write("\n")
+-- end
+
+-- function addQueen(a,n)
+-- 	if n > 8 then
+-- 		printsolution(a)
+-- 	else
+-- 		for c=1,8 do
+-- 			if isplaceok(a,n,c) then
+-- 				a[n] = c
+-- 				addQueen(a,n+1)
+-- 			end
+-- 		end
+-- 	end
+-- end
+
+-- addQueen({},1)
+
+-----------------------------------------------------
+-----------------------------------------------------
+-----------------------------------------------------
+
+
+
+-------------------------------回溯算法 输出第一种满足情况
+
+-- --当前列所处的位置
+-- local colIndexList = {}
+-- --上次回溯记录
+-- local lastSucRow   = 0
+
+-- -- 检查(n,c)是否不会被攻击
+-- function isplaceok(a,n,c)
+-- 	for i=1,n-1 do
+-- 		if (a[i] == c) or           --同一行
+-- 			(a[i]-i == c-n) or 		--对角线
+-- 			(a[i] + i == c+n) then	--对角线
+-- 			return false
+-- 		end
+-- 	end
+-- 	return true --不会被攻击
+-- end
+
+-- --打印棋盘
+-- function printsolution(a)
+-- 	for i=1,8 do
+-- 		for j=1,8 do
+-- 			io.write(a[i]==j and "X" or "-"," ")
+-- 		end
+-- 		io.write("\n")
+-- 	end
+-- 	io.write("\n")
+-- end
+
+
+-- function addQueen(col,recallTag)
+-- 	if col<1 then return end   									--小于1的列不执行
+-- 	if recallTag then   										--判断本次执行是否为回溯
+-- 		colIndexList[col] = nil									--回溯则当前序列表内值置空						
+-- 		if lastSucRow == 8 then									--回溯点已为当前列最大值则继续向前回溯
+-- 			lastSucRow = colIndexList[col-1] or 0
+-- 			addQueen(col-1,true)
+-- 			return
+-- 		end
+-- 	end
+
+-- 	for i=lastSucRow+1,8 do
+-- 		if isplaceok(colIndexList,col,i) then   				--符合要求停止循环
+-- 			colIndexList[col] = i
+-- 			if col == 8 then									--已够8列则输出
+-- 				printsolution(colIndexList)
+-- 			else							    				--不够则继续添加
+-- 				lastSucRow = 0									--设置回溯点
+-- 				addQueen(col+1)
+-- 			end	
+-- 			break
+-- 		else
+-- 			if i == 8 then										--改列没有满足的要求
+-- 				lastSucRow = colIndexList[col-1] or 0
+-- 				addQueen(col-1,true)							--回溯到上一列
+-- 			end
+-- 		end
+-- 	end
+-- end
+
+-- addQueen(1)
+
+
+-----------------------------------------------------
+-----------------------------------------------------
+-----------------------------------------------------
+
+
+
+--当前列所处的位置
+local colIndexList 			= {}
+--上次回溯记录
+local lastSucRow   			= 0
+local targetSucIndex 		= 100
+local sucIndex 				= 0
+
+-- 检查(n,c)是否不会被攻击
+function isplaceok(a,n,c)
+	for i=1,n-1 do
+		if (a[i] == c) or           --同一行
+			(a[i]-i == c-n) or 		--对角线
+			(a[i] + i == c+n) then	--对角线
+			return false
+		end
+	end
+	return true --不会被攻击
+end
+
+--打印棋盘
+function printsolution(a)
+	for i=1,8 do
+		for j=1,8 do
+			io.write(a[i]==j and "X" or "-"," ")
+		end
+		io.write("\n")
+	end
+	io.write("\n")
+end
+
+
+function addQueen(col,recallTag)
+	if col<1 then return end   									--小于1的列不执行
+	if recallTag then   										--判断本次执行是否为回溯
+		colIndexList[col] = nil									--回溯则当前序列表内值置空						
+		if lastSucRow == 8 then									--回溯点已为当前列最大值则继续向前回溯
+			lastSucRow = colIndexList[col-1] or 0
+			addQueen(col-1,true)
+			return
+		end
+	end
+
+	for i=lastSucRow+1,8 do
+		if isplaceok(colIndexList,col,i) then   				--符合要求停止循环
+			colIndexList[col] = i
+			if col == 8 then									--已够8列则输出
+				sucIndex = sucIndex + 1
+				printsolution(colIndexList)
+				if sucIndex < targetSucIndex then				--不够则继续回溯
+					lastSucRow = i
+					addQueen(col,true)						    --回溯到上一列
+				end
+			else							    				--不够则继续添加
+				lastSucRow = 0									--设置回溯点
+				addQueen(col+1)
+			end	
+			break
+		else
+			if i == 8 then										--改列没有满足的要求
+				lastSucRow = colIndexList[col-1] or 0
+				addQueen(col-1,true)							--回溯到上一列
+			end
+		end
+	end
+end
+
+addQueen(1)
